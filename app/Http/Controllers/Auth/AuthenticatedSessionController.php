@@ -34,7 +34,7 @@ class AuthenticatedSessionController extends Controller
             case 'Superadmin':
                 return redirect()->route('superadmin.dashboard');
             case 'ERB Admin':
-                return redirect()->route('erbadmin.dashboard');
+                return redirect()->route('erb.dashboard');
             case 'IACUC Admin':
                 return redirect()->route('iacucadmin.dashboard');
             case 'Reviewer':
@@ -42,10 +42,9 @@ class AuthenticatedSessionController extends Controller
             case 'Principal Investigator':
                 return redirect()->route('student.dashboard');
             default:
-                return redirect()->route('login'); // fallback
+                return redirect()->route('login');
         }
     }
-
     /**
      * Destroy an authenticated session.
      */

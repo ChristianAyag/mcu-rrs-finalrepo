@@ -65,10 +65,6 @@ Route::get('/erb/reviewers-checklist', function () {
     return view('erb.reviewers-checklist');
 });
 
-Route::get('/erb/dashboard', function () {
-    return view('erb.dashboard');
-});
-
 Route::get('/erb/settings', function () {
     return view('erb.settings');
 });
@@ -233,9 +229,9 @@ Route::post('/classifications/{id}/update', [ClassificationController::class, 'u
 */
 
 //Verification for login
-Route::get('/erbadmin/dashboard', function () {
-    return view('erbadmin.dashboard');
-})->name('erbadmin.dashboard');
+Route::get('/erb/dashboard', function () {
+    return view('erb.dashboard');
+})->name('erb.dashboard');
 
 Route::get('/iacucadmin/dashboard', function () {
     return view('iacucadmin.dashboard');
