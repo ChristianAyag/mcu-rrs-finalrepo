@@ -34,9 +34,9 @@ class AuthenticatedSessionController extends Controller
             case 'Superadmin':
                 return redirect()->route('superadmin.dashboard');
             case 'ERB Admin':
-                return redirect()->route('erbadmin.dashboard');
+                return redirect()->route('erb.dashboard');
             case 'IACUC Admin':
-                return redirect()->route('iacucadmin.dashboard');
+                return redirect()->route('iacuc.dashboard');
             case 'Reviewer':
                 return redirect()->route('reviewer.dashboard');
             case 'Principal Investigator':
