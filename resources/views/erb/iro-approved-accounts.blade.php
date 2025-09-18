@@ -22,71 +22,79 @@
 
             <!-- Table body -->
             <tbody class="text-base/7 max-lg:text-sm/6">
+                @foreach($approvedAccounts as $user)
                 <tr>
                     <td>
-                        <input type="checkbox" class="w-[14px] h-[14px] mb-1">
-                        <span>John Doe</span>
+                        <input type="checkbox" class="user-checkbox w-[14px] h-[14px] mb-1" value="{{ $user->user_ID }}">
+                        <span>{{ $user->user_Fname }} {{ $user->user_Lname }}</span>
                     </td>
-                    <td>Information Technology</td>
-                    <td>Brain Injury: Prevention and Treatment of Chronic Brain Injury</td>
-                    <td>4/15/2025<br>21:37:23</td>
-                    <td><button type="button" class="border-2 p-[5px] hover:bg-gray">Approve</button></td>
-                </tr>
-                <tr>
+                    <td>{{ $user->researchInformation?->research_department ?? 'N/A' }}</td>
+                    <td>{{ $user->researchInformation?->research_title ?? 'N/A' }}</td>
                     <td>
-                        <input type="checkbox" class="w-[14px] h-[14px] mb-1">
-                        <span>Alfreds Futterkiste</span>
+                        {{ $user->created_at ? $user->created_at->format('m/d/Y') : 'N/A' }}<br>
+                        {{ $user->created_at ? $user->created_at->format('H:i:s') : '' }}
                     </td>
-                    <td>Information Technology</td>
-                    <td>Foods for Health: Personalized Food and Nutritional Metabolic Profiling to Improve
-                        Health
-                    </td>
-                    <td>4/15/2025<br>21:37:23</td>
-                    <td>Approved</td>
+                    <td>{{ $user->classifications?->classificationStatus ?? 'N/A' }}</td>
                 </tr>
+                @endforeach
             </tbody>
         </table>
+        <!-- Main Layout -->
+        @if($approvedAccounts->isNotEmpty())
         <!-- Main Layout -->
         <div class="flex mx-4 gap-6 grid grid-cols-2 max-md:grid-cols-1">
             <!-- Left Selection -->
             <div class="bg-lightgray p-4 shadow-md rounded-md">
                 <h3 class="text-lg font-semibold mb-3">Assignment of Forms</h3>
-                <div class="gap-x-2 gap-y-2 flex grid max-sm:grid-cols-2 md:grid-cols-4 font-medium">
+                @foreach ($selectForms as $form)
                     <div class="room cursor-pointer bg-gray hover:bg-darkgray px-3 py-2 rounded-md"
-                        data-room="Form 2A">Form 2A</div>
-                    <div class="room cursor-pointer bg-gray hover:bg-darkgray px-3 py-2 rounded-md"
-                        data-room="Form 2B">Form 2B</div>
-                    <div class="room cursor-pointer bg-gray hover:bg-darkgray px-3 py-2 rounded-md"
-                        data-room="Form 2C">Form 2C</div>
-                    <div class="room cursor-pointer bg-gray hover:bg-darkgray px-3 py-2 rounded-md"
-                        data-room="Form 2D">Form 2D</div>
-                </div>
+                        data-room="{{ $form->form_id }}"
+                        data-view="{{ $form->form_view }}">
+                        {{ $form->form_code }}
+                    </div>
+                @endforeach
             </div>
 
             <!-- Right Display -->
             <div class="bg-lightgray p-4 shadow-md rounded-md">
                 <h3 class="text-lg font-semibold mb-3">Assigned Rooms</h3>
-                <ul id="assignedList" class="list-disc mx-2 pl-6 pt-2 flex grid grid-cols-3 max-sm:grid-cols-2 gap-x-2 gap-y-3"></ul>
+                <ul id="assignedList"
+                    class="list-disc mx-2 pl-6 pt-2 flex grid grid-cols-3 max-sm:grid-cols-2 gap-x-2 gap-y-3"></ul>
             </div>
         </div>
 
         <!-- Button Outside, Right-Aligned -->
         <div class="flex justify-end mt-4 mx-4">
-            <button id="submitBtn" class="bg-secondary hover:bg-primary text-primary hover:text-secondary px-4 py-3 rounded-md uppercase tracking-widest duration-200">
+            <button id="submitBtn"
+                class="bg-secondary hover:bg-primary text-primary hover:text-secondary px-4 py-3 rounded-md uppercase tracking-widest duration-200"
+                type="button">
                 Submit
             </button>
         </div>
+        @else
+        <div class="text-center p-6 bg-lightgray rounded-md text-gray-500 mt-6">
+            ⚠ No approved accounts available for form assignment.
+        </div>
+        @endif
     </main>
 </x-erb-layout>
 <script>
+    $('#myTable').DataTable({
+    retrieve: true,
+    responsive: true,
+    autoWidth: false,
+    pageLength: 10,
+    order: []
+});
     const rooms = document.querySelectorAll(".room");
     const assignedList = document.getElementById("assignedList");
     const submitBtn = document.getElementById("submitBtn");
 
     rooms.forEach(room => {
         room.addEventListener("click", () => {
-            const roomName = room.dataset.room;
-            const existingItem = assignedList.querySelector(`[data-room="${roomName}"]`);
+            const formId = room.dataset.room;
+            const formCode = room.textContent;
+            const existingItem = assignedList.querySelector(`[data-room="${formId}"]`);
 
             if (existingItem) {
                 // Remove if already assigned
@@ -94,16 +102,52 @@
             } else {
                 // Add new item
                 const li = document.createElement("li");
-                li.textContent = roomName;
-                li.setAttribute("data-room", roomName);
+                li.textContent = formCode;
+                li.setAttribute("data-room", formId);
                 assignedList.appendChild(li);
             }
         });
     });
 
     // Example action for submit
-    submitBtn.addEventListener("click", () => {
-        const assignedRooms = [...assignedList.querySelectorAll("li")].map(li => li.textContent);
-        alert("Assigned Rooms: " + assignedRooms.join(", "));
-    });
+    submitBtn.addEventListener("click", (e) => {
+    console.log("Submit button clicked ✅");
+
+    const selectedUsers = [...document.querySelectorAll(".user-checkbox:checked")].map(cb => cb.value);
+    const selectedForms = [...assignedList.querySelectorAll("li")].map(li => li.dataset.room);
+
+    console.log("Users:", selectedUsers);
+    console.log("Forms:", selectedForms);
+
+    if (selectedUsers.length === 0 || selectedForms.length === 0) {
+        alert("Please select at least one user and one form.");
+        return;
+    }
+
+    fetch("{{ route('assign.forms.ajax') }}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": "{{ csrf_token() }}"
+        },
+        body: JSON.stringify({
+            user_ids: selectedUsers,
+            form_ids: selectedForms
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        console.log("Server response:", data);
+        if (data.success) {
+            alert(data.message);
+
+            // Reset UI
+            document.querySelectorAll(".user-checkbox").forEach(cb => cb.checked = false);
+            assignedList.innerHTML = "";
+        } else {
+            alert("Something went wrong.");
+        }
+    })
+    .catch(err => console.error("Fetch error:", err));
+});
 </script>

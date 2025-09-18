@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\FormAssignment;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
@@ -63,10 +64,6 @@ Route::get('/erb/assign-reviewer', function () {
 
 Route::get('/erb/reviewers-checklist', function () {
     return view('erb.reviewers-checklist');
-});
-
-Route::get('/erb/dashboard', function () {
-    return view('erb.dashboard');
 });
 
 Route::get('/erb/settings', function () {
@@ -233,9 +230,9 @@ Route::post('/classifications/{id}/update', [ClassificationController::class, 'u
 */
 
 //Verification for login
-Route::get('/erbadmin/dashboard', function () {
-    return view('erbadmin.dashboard');
-})->name('erbadmin.dashboard');
+Route::get('/erb/dashboard', function () {
+    return view('erb.dashboard');
+})->name('erb.dashboard');
 
 Route::get('/iacucadmin/dashboard', function () {
     return view('iacucadmin.dashboard');
@@ -244,6 +241,11 @@ Route::get('/iacucadmin/dashboard', function () {
 Route::get('/reviewer/dashboard', function () {
     return view('reviewer.dashboard');
 })->name('reviewer.dashboard');
+
+Route::get('/erb/iro-approved-accounts', [FormAssignment::class, 'approvedAccounts'])
+    ->name('erb.iro-approved-accounts');
+Route::post('/assign-forms-ajax', [FormAssignment::class, 'assignFormsAjax'])
+    ->name('assign.forms.ajax');
 
 //Storing Data for Form2A
 Route::get('/student/download-forms', [Form2AController::class, 'index'])->name('download-forms');
