@@ -51,16 +51,13 @@
             <!-- Left Selection -->
             <div class="bg-lightgray p-4 shadow-md rounded-md">
                 <h3 class="text-lg font-semibold mb-3">Assignment of Forms</h3>
-                <div class="gap-x-2 gap-y-2 flex grid max-sm:grid-cols-2 md:grid-cols-4 font-medium">
-                    <div class="room cursor-pointer bg-gray hover:bg-darkgray px-3 py-2 rounded-md"
-                        data-room="Form 2A">Form 2A</div>
-                    <div class="room cursor-pointer bg-gray hover:bg-darkgray px-3 py-2 rounded-md"
-                        data-room="Form 2B">Form 2B</div>
-                    <div class="room cursor-pointer bg-gray hover:bg-darkgray px-3 py-2 rounded-md"
-                        data-room="Form 2C">Form 2C</div>
-                    <div class="room cursor-pointer bg-gray hover:bg-darkgray px-3 py-2 rounded-md"
-                        data-room="Form 2D">Form 2D</div>
-                </div>
+                    @foreach ($selectForms as $form)
+                        <div class="room cursor-pointer bg-gray hover:bg-darkgray px-3 py-2 rounded-md"
+                            data-room="{{ $form->form_id }}"
+                            data-view="{{ $form->form_view }}">
+                            {{ $form->form_code }}
+                        </div>
+                    @endforeach
             </div>
 
             <!-- Right Display -->
@@ -85,8 +82,9 @@
 
     rooms.forEach(room => {
         room.addEventListener("click", () => {
-            const roomName = room.dataset.room;
-            const existingItem = assignedList.querySelector(`[data-room="${roomName}"]`);
+            const formId = room.dataset.room;
+            const formCode = room.textContent;
+            const existingItem = assignedList.querySelector(`[data-room="${formId}"]`);
 
             if (existingItem) {
                 // Remove if already assigned
@@ -94,8 +92,8 @@
             } else {
                 // Add new item
                 const li = document.createElement("li");
-                li.textContent = roomName;
-                li.setAttribute("data-room", roomName);
+                li.textContent = formCode;
+                li.setAttribute("data-room", formId);
                 assignedList.appendChild(li);
             }
         });

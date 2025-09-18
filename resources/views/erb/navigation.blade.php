@@ -100,7 +100,7 @@
             <div class="flex items-center flex-nowrap">
                 <img src="" alt="" class="h-[45px] w-[45px] object-cover rounded-[50%] mr-[10px] border-2 border-white">
                 <div class="">
-                    <div class="text-[16px] whitespace-nowrap">Iyong Pangalan</div>
+                    <div class="text-[16px] whitespace-nowrap">{{ Auth::user()->user_Fname }} {{ Auth::user()->user_MI }} {{ Auth::user()->user_Lname }}</div>
                     <div class="text-[14px] whitespace-nowrap">ERB Admin</div>
                 </div>
             </div>

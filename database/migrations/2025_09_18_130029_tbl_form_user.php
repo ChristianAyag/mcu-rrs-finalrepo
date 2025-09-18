@@ -11,7 +11,27 @@ return new class extends Migration
      */
     public function up(): void
     {
-        //
+        Schema::create('tbl_form_user', function (Blueprint $table) {
+            $table->id('id');
+
+            // Foreign keys
+            $table->string('user_ID');
+            $table->unsignedBigInteger('user_id');
+
+            $table->timestamps();
+
+            // Constraints
+            $table->foreign('form_id')
+                ->references('form_id')->on('tbl_forms')
+                ->onDelete('cascade');
+
+            $table->foreign('user_ID')
+                ->references('user_ID')->on('tbl_users')
+                ->onDelete('cascade');
+
+            // Prevent duplicates
+            $table->unique(['form_id', 'user_id']);
+        });
     }
 
     /**
@@ -19,6 +39,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::dropIfExists('tbl_form_user');
     }
 };

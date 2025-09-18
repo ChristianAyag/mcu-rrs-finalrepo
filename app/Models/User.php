@@ -63,6 +63,11 @@ class User extends Authenticatable
     {
         return $this->hasOne(ResearchInformation::class, 'user_ID', 'user_ID');
     }
+    public function forms()
+    {
+        return $this->belongsToMany(FormsTable::class, 'tbl_form_user', 'user_ID', 'form_id')
+                    ->withTimestamps();
+    }
     /**
      * Get the attributes that should be cast.
      *

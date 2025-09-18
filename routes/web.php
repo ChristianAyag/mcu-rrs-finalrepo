@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\FormAssignment;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
@@ -240,6 +241,9 @@ Route::get('/iacucadmin/dashboard', function () {
 Route::get('/reviewer/dashboard', function () {
     return view('reviewer.dashboard');
 })->name('reviewer.dashboard');
+
+Route::get('/erb/iro-approved-accounts', [FormAssignment::class, 'approvedAccounts'])
+    ->name('erb.iro-approved-accounts');
 
 //Storing Data for Form2A
 Route::get('/student/download-forms', [Form2AController::class, 'index'])->name('download-forms');
