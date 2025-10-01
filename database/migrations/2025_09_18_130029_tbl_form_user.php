@@ -30,7 +30,7 @@ return new class extends Migration
                 ->onDelete('cascade');
 
             // Prevent duplicates
-            $table->unique(['form_id', 'user_id']);
+            $table->unique(['form_id', 'user_ID']);
         });
     }
 

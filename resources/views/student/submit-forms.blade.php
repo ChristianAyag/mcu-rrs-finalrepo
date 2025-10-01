@@ -9,33 +9,23 @@
         <div class="p-6 max-md:p-0 space-y-10">
             <div class="my-4">
                 <h2 class="mb-4 font-semibold text-[20px]">Deficiencies</h2>
-                <!-- nilagyan ko lang ng href para madirect sa submit-form-layout page -->
-                <a href="{{ url('student/submit-form-layout') }}">
-                    <div
-                        class="hover:bg-gray my-3 bg-lightgray p-4 rounded-lg flex justify-between items-center duration-200">
-                        <div class="block items-center flex-wrap gap-[10px]">
-                            <h2 class="text-lg max-sm:text-base font-semibold">FORM 2(A)</h2>
-                            <p class="text-sm max-sm:text-xs">Due at 08/10/2025</p>
-                            <label for="" class="mt-1 text-sm max-sm:text-xs">STUDY PROTOCOL REVIEW CHECKLIST</label>
+                @forelse($submissionForms as $form)
+                    <a href="{{ route('student.submit.form', $form->form_id) }}">
+                        <div
+                            class="hover:bg-gray my-3 bg-lightgray p-4 rounded-lg flex justify-between items-center duration-200">
+                            <div class="block items-center flex-wrap gap-[10px]">
+                                <h2 class="text-lg max-sm:text-base font-semibold">
+                                    {{ $form->form_code }}
+                                </h2>
+                                <label class="mt-1 text-sm max-sm:text-xs">
+                                    {{ $form->form_name }}
+                                </label>
+                            </div>
                         </div>
-                    </div>
-                </a>
-                <div
-                    class="hover:bg-gray my-3 bg-lightgray p-4 rounded-lg flex justify-between items-center duration-200">
-                    <div class="block items-center flex-wrap gap-[10px]">
-                        <h2 class="text-lg max-sm:text-base font-semibold">FORM 2(B)</h2>
-                        <p class="text-sm max-sm:text-xs">Due at 08/10/2025</p>
-                        <label for="" class="mt-1 text-sm max-sm:text-xs">APPLICATION FOR INITIAL REVIEW</label>
-                    </div>
-                </div>
-                <div
-                    class="hover:bg-gray my-3 bg-lightgray p-4 rounded-lg flex justify-between items-center duration-200">
-                    <div class="block items-center flex-wrap gap-[10px]">
-                        <h2 class="text-lg max-sm:text-base font-semibold">FORM 2(C)</h2>
-                        <p class="text-sm max-sm:text-xs">Due at 08/10/2025</p>
-                        <label for="" class="mt-1 text-sm max-sm:text-xs">INFORMED CONSENT FORM</label>
-                    </div>
-                </div>
+                    </a>
+                @empty
+                    <p class="text-sm text-gray-600">No assigned forms to submit.</p>
+                @endforelse
             </div>
         </div>
     </main>

@@ -24,4 +24,9 @@ class FormsTable extends Model
         return $this->belongsToMany(User::class, 'tbl_form_user', 'form_id', 'user_ID')
                     ->withTimestamps();
     }
+
+    public function researchFiles()
+    {
+        return $this->hasMany(ResearchFiles::class, 'form_id', 'form_id');
+    }
 }

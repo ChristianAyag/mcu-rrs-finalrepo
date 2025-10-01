@@ -11,24 +11,24 @@
                 <div class="grid max-md:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     @if ($assignedForms->isEmpty())
                         <p class="text-gray-500">⚠ No forms have been assigned to you yet.</p>
+                    <div class="grid max-md:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     @else
-                        <div class="grid max-md:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                @foreach($assignedForms as $form)
-                                    <a href="{{ url( $form->form_view) }}">
-                                        <div class="card bg-lightgray p-4 rounded-lg flex justify-between items-center cursor-pointer">
-                                            <div class="block items-center flex-wrap gap-[10px]">
-                                                <h2 class="text-xl max-md:text-[18px] font-semibold">
-                                                    {{ $form->form_code }}
-                                                </h2>
-                                                <p class="text-xs font-medium">
-                                                    {{ $form->form_name }}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </a>
-                                @endforeach
-                        </div>
+                        @foreach($assignedForms as $form)
+                            <a href="{{ url( $form->form_view) }}">
+                                <div class="card bg-lightgray p-4 rounded-lg flex justify-between items-center cursor-pointer">
+                                    <div class="block items-center flex-wrap gap-[10px]">
+                                        <h2 class="text-xl max-md:text-[18px] font-semibold">
+                                            {{ $form->form_code }}
+                                        </h2>
+                                        <p class="text-xs font-medium">
+                                            {{ $form->form_name }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </a>
+                        @endforeach
                     @endif
+                    </div>
                 </div>
             </div>
         </div>

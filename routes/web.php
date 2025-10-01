@@ -10,7 +10,7 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\PdfExportController;
 use App\Http\Controllers\ClassificationController;
 use App\Http\Controllers\Form2AController;
-Use App\Http\Controllers\ResearchController;
+use App\Http\Controllers\ResearchFileController;
 use Laravel\Tinker\ClassAliasAutoloader;
 //use App\Http\Controllers\Form2BController;
 //use App\Http\Controllers\Form2CController;
@@ -197,9 +197,11 @@ Route::middleware(['auth','access:Principal Investigator'])->prefix('student')->
         return view('student.dashboard');
     })->name('student.dashboard');
 
-    Route::get('/submit-forms', function () {
-        return view('student.submit-forms');
-    });
+    Route::get('/submit-forms', [FormAssignment::class, 'assignedSubmissionDisplay'])
+    ->name('student.submit-forms');
+
+    Route::get('/submit-form-layout/{form}', [ResearchFileController::class, 'showForm'])
+        ->name('student.submit.form');
 
     Route::get('/submit-tickets', function () {
         return view('student.submit-tickets');

@@ -71,4 +71,14 @@ class FormAssignment extends Controller
 
         return view('student.download-forms', compact('assignedForms'));
     }
+
+    public function assignedSubmissionDisplay(){
+        $student = auth()->user();
+
+        $submissionForms = $student->forms()
+            ->where('form_type', 'Submission')
+            ->get();
+        
+        return view('student.submit-forms', compact('submissionForms'));
+    }
 }
