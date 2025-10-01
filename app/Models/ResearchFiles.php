@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class ResearchFiles extends Model
 {
     protected $table = 'tbl_research_files';
+
+    public $timestamps = true;
     protected $fillable = [
         'user_ID',
         'form_id',

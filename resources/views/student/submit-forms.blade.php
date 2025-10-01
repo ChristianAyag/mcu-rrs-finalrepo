@@ -10,7 +10,7 @@
             <div class="my-4">
                 <h2 class="mb-4 font-semibold text-[20px]">Deficiencies</h2>
                 @forelse($submissionForms as $form)
-                    <a href="{{ route('student.submit.form', $form->form_id) }}">
+                    <a href="{{ route('student.submit.form', ['form' => $form->form_id]) }}">
                         <div
                             class="hover:bg-gray my-3 bg-lightgray p-4 rounded-lg flex justify-between items-center duration-200">
                             <div class="block items-center flex-wrap gap-[10px]">

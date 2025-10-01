@@ -6,12 +6,32 @@
         <br>
         <div class="p-6 max-md:p-0 space-y-10">
             <div class="duration-200 my-4 p-4 max-sm:p-0">
-                <h2 class="font-semibold text-2xl max-sm:text-[19px]">Form 2(A)</h2>
-                <p class="max-md:text-[15px]">Due at August 10, 2025 11:59PM</p><br>
+                {{-- Dynamic form name --}}
+                <h2 class="font-semibold text-2xl max-sm:text-[19px]">
+                    {{ $form->form_name }}
+                </h2>
+
+                {{-- Dynamic due date if available --}}
+                <p class="max-md:text-[15px]">
+                    @if($form->due_date)
+                        Due at {{ \Carbon\Carbon::parse($form->due_date)->format('F d, Y h:i A') }}
+                    @else
+                        No deadline specified
+                    @endif
+                </p>
+                <br>
+
                 <p class="max-md:text-[15px]">Attach the files here</p>
+
+                <!-- Upload Form -->
+            <form action="{{ route('student.submit.form.store', ['form' => $form->form_id]) }}" 
+                      method="POST" 
+                      enctype="multipart/form-data">
+
+                      @csrf
                 <div class="max-w-xs w-xs cursor-pointer">
-                    <div class="">
-                        <input type="file" name="uploadForms" id="upload" accept=".doc,.docx,.pdf" multiple hidden>
+                    <div>
+                        <input type="file" name="uploadForms[]" id="upload" accept=".doc,.docx,.pdf" multiple hidden>
                         <label for="upload"
                             class="w-full text-md min-h-[50px] flex-col justify-center items-center rounded cursor-pointer">
                             <i class="bi bi-cloud-arrow-up-fill text-primary"></i>
@@ -21,6 +41,7 @@
                         </label>
                     </div>
                 </div>
+
                 <div id="fileWrapper">
                     <h3 class="my-[30px] max-md:mb-3 text-[20px] max-md:text-[17px] font-bold">
                         Uploaded Documents
@@ -33,11 +54,12 @@
                     </div>
                 </div>
 
-                <div class="">
+                <div>
                     <x-primary-button class="mt-4">
                         SUBMIT
                     </x-primary-button>
                 </div>
+                </form>
             </div>
         </div>
     </main>

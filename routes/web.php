@@ -203,6 +203,9 @@ Route::middleware(['auth','access:Principal Investigator'])->prefix('student')->
     Route::get('/submit-form-layout/{form}', [ResearchFileController::class, 'showForm'])
         ->name('student.submit.form');
 
+    Route::post('/submit-form-layout/{form}/store', [ResearchFileController::class, 'storeSubmission'])
+        ->name('student.submit.form.store');
+
     Route::get('/submit-tickets', function () {
         return view('student.submit-tickets');
     });
