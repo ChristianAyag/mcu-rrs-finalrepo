@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+table td, table th {
+    text-align: left !important;
+    position: relative;
+}
+
+@media (max-width: 380px){
+    label {
+        font-size: 14px;
+    }
+
+    .dt-input {
+        height: 27px;
+    }
+
+    .dt-info {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 500px){
+    label {
+        font-size: 14px;
+    }
+
+    .dt-input {
+        height: 27px;
+    }
+
+    .dt-info {
+        font-size: 14px;
+    }
+}
+
+:root {
+    --primary: #5c297c;
+    --secondary: #f0a71f;
+    --light: #ffffff;
+    --gray: #dbdbdb;
+    --darkgray: #a9a9a9;
+    --lightgray: #f5f5f5;
+    --blue: #0096ff;
+    --darkblue: #00008b;
+    --whitepurple: #9954c4;
+}
