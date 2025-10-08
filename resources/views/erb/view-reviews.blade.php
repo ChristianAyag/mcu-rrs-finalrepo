@@ -11,67 +11,61 @@
             <!-- Table header -->
             <thead class="bg-primary text-white text-lg/7 max-lg:text-base/7">
                 <tr class="header-table">
-                    <th class="w-[16.66%]">Research Protocol</th>
-                    <th class="w-[16.66%]">Research Title</th>
-                    <th class="w-[16.66%]">P.I. Name</th>
-                    <th class="w-[16.66%]">Co-I. Name(s)</th>
-                    <th class="w-[16.66%]">View</th>
-                    <th class="w-[16.66%]">Date Submitted</th>
+                    <th class="w-[14%]">Research Protocol</th>
+                    <th class="w-[20%]">Research Title</th>
+                    <th class="w-[14%]">P.I. Name</th>
+                    <th class="w-[16%]">Co-I. Name(s)</th>
+                    <th class="w-[14%]">Reviewer</th>
+                    <th class="w-[10%]">View</th>
+                    <th class="w-[12%]">Date Submitted</th>
                 </tr>
             </thead>
+
             <!-- Table body -->
             <tbody class="text-base/7 max-lg:text-sm/6">
-                <tr>
-                    <td>2025-001</td>
-                    <td>Analyzing the Influence of Cultural Factors on Consumer Behavior</td>
-                    <td>Karin Josephs</td>
-                    <td>
-                        Alexander Feuer<label for="">,</label><br>
-                        Rene Phillips
-                    </td>
-                    <td>
-                        <a href="{{ url('erb/viewing-file?user_id=1') }}">
-                            <button class="border-2 p-[5px] hover:bg-gray">
-                                View
-                            </button>
-                        </a>
-                    </td>
-                    <td>4/15/2025<br>21:37:23</td>
-                </tr>
-                <tr>
-                    <td>2025-002</td>
-                    <td>Investigating the Link Between Air Pollution and Respiratory Diseases</td>
-                    <td>Paula Parente</td>
-                    <td>
-                        Pascale Cartrain<label for="">,</label><br>
-                        Miguel Angel Paolino
-                    </td>
-                    <td><button class="border-2 p-[5px] hover:bg-gray">View</button></td>
-                    <td>4/15/2025<br>21:37:23</td>
-                </tr>
-                <tr>
-                    <td>2025-003</td>
-                    <td>The Role of Artificial Intelligence in Enhancing Healthcare Delivery</td>
-                    <td>Yvonne Moncada</td>
-                    <td>
-                        Philip Cramer<label for="">,</label><br>
-                        Patricia McKenna
-                    </td>
-                    <td><button class="border-2 p-[5px] hover:bg-gray">View</button></td>
-                    <td>4/15/2025<br>21:37:23</td>
-                </tr>
-                <tr>
-                    <td>2025-004</td>
-                    <td>Evaluating the Effectiveness of Mindfulness-Based Stress Reduction in Chronic Pain
-                        Management</td>
-                    <td>Catherine Dewey</td>
-                    <td>
-                        Philip Cramer<label for="">,</label><br>
-                        Patricia McKenna
-                    </td>
-                    <td><button class="border-2 p-[5px] hover:bg-gray">View</button></td>
-                    <td>4/15/2025<br>21:37:23</td>
-                </tr>
+                @forelse ($evaluatedReviews as $review)
+                    <tr>
+                        <td>{{ $review->protocol->protocol_ID ?? 'N/A' }}</td>
+
+                        <td>{{ $review->protocol->researchInformation->research_title ?? 'Untitled' }}</td>
+
+                        <td>
+                            {{ $review->protocol->researchInformation->user->user_Fname ?? 'N/A' }}
+                            {{ $review->protocol->researchInformation->user->user_Lname ?? '' }}
+                        </td>
+
+                        <td>
+                            @php
+                                $coInvestigators = $review->protocol->researchInformation->research_CoInvestigator;
+                            @endphp
+                            {{ $coInvestigators ?? 'N/A' }}
+                        </td>
+
+                        <td>
+                            {{ $review->reviewer->user_Fname ?? 'N/A' }}
+                            {{ $review->reviewer->user_Lname ?? '' }}
+                        </td>
+
+                        <td>
+                            <a href="{{ route('erb.view-review-files', ['protocolId' => $review->protocol_ID, 'reviewerId' => $review->reviewer_ID]) }}">
+                                <button class="border-2 p-[5px] hover:bg-gray">View</button>
+                            </a>
+                        </td>
+
+                        <td>
+                            {{ $review->created_at->format('m/d/Y') }}<br>
+                            {{ $review->created_at->format('H:i:s') }}
+                            <br>
+                            <span class="text-sm text-gray-600 italic">
+                                ({{ $review->status }})
+                            </span>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="7" class="text-center py-3">No reviews found.</td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
     </main>

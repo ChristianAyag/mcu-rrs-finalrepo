@@ -14,6 +14,8 @@ use App\Http\Controllers\ResearchFileController;
 use App\Http\Controllers\ReviewerInformationController;
 use App\Http\Middleware\CheckReviewerInformation;
 use App\Http\Controllers\ERBReviewer;
+use App\Http\Controllers\ERBViewReviews;
+use App\Http\Controllers\ERBDecisionController;
 use Laravel\Tinker\ClassAliasAutoloader;
 use App\Http\Controllers\Form2AController;
 use App\Http\Controllers\Form2BController;
@@ -71,9 +73,11 @@ Route::middleware(['auth', 'access:ERB Admin'])->prefix('erb')->group(function (
         ->name('erb.approved.accounts');
 
     // Pending Reviews
-    Route::get('/pending-reviews', function () {
-        return view('erb.pending-reviews');
-    });
+    Route::get('/pending-reviews', [ERBDecisionController::class, 'index'])
+    ->name('erb.pending-reviews');
+
+    Route::post('/pending-reviews/store', [ERBDecisionController::class, 'store'])
+    ->name('erb.pending-reviews.store');
 
     // Assign Reviewer
     Route::get('/assign-reviewer', [assignReviewer::class, 'index'])->name('erb.assigned-reviewer');
@@ -82,13 +86,11 @@ Route::middleware(['auth', 'access:ERB Admin'])->prefix('erb')->group(function (
     ->name('assign-reviewer.store');
     
     // View Reviews
-    Route::get('/view-reviews', function () {
-        return view('erb.view-reviews');
-    });
+    Route::get('/view-reviews', [ERBViewReviews::class, 'index'])
+    ->name('erb.view-reviews');
 
-    Route::get('/viewing-file', function () {
-        return view('erb.viewing-file');
-    });
+    Route::get('/erb/view-review-files/{protocolId}/{reviewerId}', [ERBViewReviews::class, 'showFiles'])
+    ->name('erb.view-review-files');
 
     // Settings
     Route::get('/settings', function () {
