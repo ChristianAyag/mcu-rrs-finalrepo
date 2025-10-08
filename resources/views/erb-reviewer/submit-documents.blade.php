@@ -29,7 +29,7 @@
                     <p class="max-md:text-[15px]">Attach the files here</p>
 
                     {{-- Upload form --}}
-                    <form action="{{ route('erb-reviewer.submit-documents.store', ['form' => $form->form_id]) }}" 
+                    <form action="{{ route('erb-reviewer.submit-documents.store', $form->form_id) }}" 
                           method="POST" 
                           enctype="multipart/form-data"
                           onsubmit="return validateFiles();">

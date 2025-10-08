@@ -232,7 +232,7 @@ Route::middleware(['auth', 'access:ERB Reviewer', CheckReviewerInformation::clas
     Route::get('/submit-documents/{form}', [ERBReviewer::class, 'showSubmitDocuments'])
         ->name('erb-reviewer.submit-documents');
 
-    Route::post('/submit-documents/{form}', [ERBReviewer::class, 'storeSubmittedDocument'])
+    Route::post('/submit-documents/{form}', [ERBReviewer::class, 'submitForm'])
         ->name('erb-reviewer.submit-documents.store');
 });
 
@@ -247,7 +247,7 @@ Route::middleware(['auth', 'access:ERB Reviewer'])
         Route::post('/college-dept', [ReviewerInformationController::class, 'erbStore'])
             ->name('erb-reviewer.college-dept.store');
     });
-
+    
 //iacuc reviewer
 Route::get('/iacuc-reviewer/dashboard', function () {
     return view('iacuc-reviewer.dashboard');
