@@ -16,6 +16,7 @@ use App\Http\Middleware\CheckReviewerInformation;
 use App\Http\Controllers\ERBReviewer;
 use App\Http\Controllers\ERBViewReviews;
 use App\Http\Controllers\ERBDecisionController;
+use App\Http\Controllers\TicketController;
 use Laravel\Tinker\ClassAliasAutoloader;
 use App\Http\Controllers\Form2AController;
 use App\Http\Controllers\Form2BController;
@@ -296,6 +297,7 @@ Route::middleware(['auth', 'access:Principal Investigator'])->prefix('student')-
     Route::get('/settings', function () {
         return view('student.settings');
     });
+    Route::post('/tickets/store', [TicketController::class, 'store'])->name('student.tickets.store');
     // sample form layout
     Route::prefix('forms')->group(function () {
         Route::get('/form2a', function () {
@@ -363,8 +365,6 @@ Route::get('/export-protocol-review-checklist', [PdfExportController::class, 'ex
 Route::get('/export-protocol-review-form', [PdfExportController::class, 'exportProtocolReview'])->name('export.protocol-review-form');
 
 //Storing Data for Form2B
-
-
 //Storing Data for Form2B
 //Route::get('/student/download-forms', [Form2BController::class, 'index'])->name('download-forms');
 //Route::post('/student/store', [Form2BController::class, 'store'])->name('form2b.store');
