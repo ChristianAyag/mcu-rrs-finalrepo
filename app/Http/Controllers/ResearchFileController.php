@@ -68,18 +68,25 @@ class ResearchFileController extends Controller
 
     public function researchRecords()
     {
-        $researchRecords = ResearchInformation::query()
-            ->with([
-                'user' => function ($query) {
-                    $query->with([
-                        'researchFiles',
-                        'initialReviews' => function ($q) {
-                            $q->with(['form', 'reviewer1', 'reviewer2', 'protocol']);
-                        },
-                    ]);
-                },
-            ])
-            ->get();
+        $researchRecords = ResearchInformation::with([
+            // Load the P.I. user and their related data
+            'user' => function ($query) {
+                $query->with([
+                    // Load all submitted files
+                    'researchFiles',
+                    // Load all initial reviews and reviewers
+                    'initialReviews' => function ($q) {
+                        $q->with([
+                            'protocol',        // Load protocol info
+                            'reviewer1',       // Load reviewer 1 details
+                            'reviewer2',       // Load reviewer 2 details
+                        ]);
+                    },
+                    // Load approved decisions
+                    'approved'
+                ]);
+            },
+        ])->get();
 
         return view('erb.research-records', compact('researchRecords'));
     }

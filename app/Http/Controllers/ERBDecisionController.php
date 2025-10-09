@@ -46,14 +46,15 @@ class ERBDecisionController extends Controller
 
     public function store(Request $request)
     {
+        // ✅ Validate request
         $request->validate([
             'protocol_id' => 'required|string|exists:tbl_protocol,protocol_ID',
-            'decision' => 'required|string',
+            'decision' => 'required|string|in:Approved,Resubmission',
         ]);
 
         try {
             $protocolId = $request->protocol_id;
-            $decision = $request->decision;
+            $decision = $request->decision; // now lowercase to match request input
 
             // ✅ Get the Principal Investigator (PI) linked to this protocol
             $protocol = Protocol::with('researchInformation')
@@ -67,53 +68,67 @@ class ERBDecisionController extends Controller
                 ]);
             }
 
-            $piUserId = $protocol->researchInformation->user_ID; // ✅ P.I.'s user_ID
+            $piUserId = $protocol->researchInformation->user_ID; // P.I.'s user_ID
 
-            // ✅ Only act if the decision is "Approved"
+            // ✅ Insert or update the decision in tbl_approved
+            Approved::updateOrCreate(
+                [
+                    'Protocol_ID' => $protocolId,
+                    'user_ID' => $piUserId,
+                ],
+                [
+                    'Decision' => $decision, // matches DB column name
+                ]
+            );
+
+            // ✅ Assign Form 3L only if Approved
             if ($decision === 'Approved') {
-                // --- Insert into tbl_approved ---
-                $alreadyApproved = Approved::where('Protocol_ID', $protocolId)
-                    ->where('user_ID', $piUserId)
-                    ->exists();
-
-                if (!$alreadyApproved) {
-                    Approved::create([
-                        'user_ID' => $piUserId,
-                        'Protocol_ID' => $protocolId,
-                    ]);
-                }
-
-                // --- Assign Form 3L to the PI ---
                 $form3L = FormsTable::where('form_code', 'FORM 3(L)')->first();
 
                 if ($form3L) {
-                    $alreadyAssigned = FormUser::where('user_ID', $piUserId)
-                        ->where('form_id', $form3L->form_id)
-                        ->exists();
-
-                    if (!$alreadyAssigned) {
-                        FormUser::create([
+                    FormUser::updateOrCreate(
+                        [
                             'user_ID' => $piUserId,
                             'form_id' => $form3L->form_id,
-                        ]);
-                    }
+                        ]
+                    );
                 } else {
                     return response()->json([
                         'success' => false,
                         'message' => 'Form 3L not found in tbl_forms.',
                     ]);
                 }
+            }elseif ($decision === 'Resubmission') {
+            // --- Assign Form 3A and 3B to the student ---
+                $studentUserId = $protocol->researchInformation->user_ID; // Assuming the PI is the student, adjust if different
 
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Protocol approved and Form 3L assigned to the Principal Investigator.',
-                ]);
+                $form3A = FormsTable::where('form_code', 'FORM 3(A)')->first();
+                $form3B = FormsTable::where('form_code', 'FORM 3(B)')->first();
+
+                if ($form3A) {
+                    FormUser::updateOrCreate(
+                        [
+                            'user_ID' => $studentUserId,
+                            'form_id' => $form3A->form_id,
+                        ]
+                    );
+                }
+
+                if ($form3B) {
+                    FormUser::updateOrCreate(
+                        [
+                            'user_ID' => $studentUserId,
+                            'form_id' => $form3B->form_id,
+                        ]
+                    );
+                }
             }
-
-            // ✅ For other decisions
+            // ✅ Return success response
             return response()->json([
                 'success' => true,
-                'message' => "Decision '{$decision}' recorded successfully.",
+                'message' => $decision === 'Approved'
+                    ? 'Protocol approved and Form 3L assigned to the Principal Investigator.'
+                    : 'Resubmission recorded successfully for the Principal Investigator.',
             ]);
 
         } catch (\Exception $e) {
@@ -123,4 +138,5 @@ class ERBDecisionController extends Controller
             ], 500);
         }
     }
+
 }

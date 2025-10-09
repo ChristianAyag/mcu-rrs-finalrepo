@@ -34,5 +34,9 @@ class Protocol extends Model
     {
         return $this->hasMany(FormsTable::class, 'form_protocol_ID', 'protocol_ID');
     }
+    public function evaluatedReviews()
+    {
+        return $this->hasMany(EvaluatedReviews::class, 'protocol_ID', 'protocol_ID');
+    }
 }
 

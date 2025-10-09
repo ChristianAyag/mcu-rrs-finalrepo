@@ -7,29 +7,28 @@
         </h2>
         <br>
 
-        <table id="myTable" class="display overflow-scroll border-collapse w-full">
-            <!-- Table header -->
-            <thead class="bg-primary text-white text-lg/7 max-lg:text-base/7">
-                <tr class="header-table">
-                    <th class="w-[16.66%]">Research Title</th>
-                    <th class="w-[16.66%]">P.I. Name</th>
-                    <th class="w-[16.66%]">Co-Investigators</th>
-                    <th class="w-[16.66%]">Assigned Reviewer</th>
-                    <th class="w-[16.66%]">Date Reviewed</th>
-                    <th class="w-[16.66%]">Accept/Reject</th>
-                </tr>
-            </thead>
-            <!-- Table body -->
-            <tbody class="text-base/7 max-lg:text-sm/6">
-                <tr>
-                    <td>Brain Injury: Prevention and Treatment of Chronic Brain Injury</td>
-                    <td>John Doe</td>
-                    <td>John Doe, Alfreds Futterkiste</td>
-                    <td>N/A</td>
-                    <td>08/10/2025<br>18:06:25</td>
-                    <td>Accepted</td>
-                </tr>
-            </tbody>
-        </table>
+            <table id="myTable" class="display overflow-scroll border-collapse w-full">
+                <thead class="bg-primary text-white text-lg/7 max-lg:text-base/7">
+                    <tr class="header-table">
+                        <th class="w-[16.66%]">Research Title</th>
+                        <th class="w-[16.66%]">PI Name</th>
+                        <th class="w-[16.66%]">Co-Investigators</th>
+                        <th class="w-[16.66%]">Assign</th>
+                    </tr>
+                </thead>
+                <tbody class="text-base/7 max-lg:text-sm/6">
+                    @foreach ($piWithForms as $assignReviewer)
+                    <tr>
+                        <td>
+                            <input type="checkbox" value="{{ $assignReviewer->user_ID }}">
+                            <span>{{ $assignReviewer->researchInformation?->research_title }}</span>
+                        </td>
+                        <td>{{ $assignReviewer->user_Fname }} {{ $assignReviewer->user_MI }} {{ $assignReviewer->user_Lname }}</td>
+                        <td>{{ $assignReviewer->researchInformation?->research_CoInvestigator }}</td>
+                        <td>Pending</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
     </main>
 </x-superadmin-layout>

@@ -11,34 +11,59 @@
             <!-- Table header -->
             <thead class="bg-primary text-white text-lg/7 max-lg:text-base/7">
                 <tr class="header-table">
-                    <th class="w-[16.66%]">P.I. Name</th>
+                    <th class="w-[16.66%]">Protocol ID</th>
                     <th class="w-[16.66%]">Research Title</th>
-                    <th class="w-[16.66%]">Assigned Reviewer</th>
+                    <th class="w-[16.66%]">P.I. Name</th>
+                    <th class="w-[16.66%]">Co-Investigator</th>
                     <th class="w-[16.66%]">Status</th>
                     <th class="w-[16.66%]">Date Submitted</th>
                     <th class="w-[16.66%]">Review Date</th>
                 </tr>
             </thead>
+
             <!-- Table body -->
             <tbody class="text-base/7 max-lg:text-sm/6">
+                @forelse($evaluatedProtocols as $review)
                 <tr>
-                    <td>John Doe</td>
-                    <td>Brain Injury: Prevention and Treatment of Chronic Brain Injury</td>
-                    <td>N/A</td>
-                    <td>Not Reviewed</td>
-                    <td>N/A</td>
-                    <td>N/A</td>
-                </tr>
-                <tr>
-                    <td>Alfreds Futterkiste</td>
-                    <td>Foods for Health: Personalized Food and Nutritional Metabolic Profiling to Improve
-                        Health
+                    <!-- Protocol ID with checkbox (moved to first column) -->
+                    <td>
+                        <span>{{ $review->protocol_ID }}</span>
                     </td>
-                    <td>Mario Pontes</td>
-                    <td>Ongoing Review</td>
-                    <td>4/15/2025<br>21:37:23</td>
-                    <td>4/15/2025<br>22:37:50</td>
+
+                    <!-- Research Title -->
+                    <td>{{ $review->research_title }}</td>
+
+                    <!-- Principal Investigator Name -->
+                    <td>{{ $review->user_Fname }}</td>
+
+                    <td>{{ $review->co_investigator }}</td>
+
+                    <!-- Status -->
+                    <td>{{ $review->status ?? 'Pending' }}</td>
+
+                    <!-- Date Submitted -->
+                    <td>
+                        @if($review->date_submitted)
+                            {{ \Carbon\Carbon::parse($review->date_submitted)->format('m/d/Y H:i') }}
+                        @else
+                            N/A
+                        @endif
+                    </td>
+
+                    <!-- Review Date -->
+                    <td>
+                        @if($review->review_date)
+                            {{ \Carbon\Carbon::parse($review->review_date)->format('m/d/Y H:i') }}
+                        @else
+                            N/A
+                        @endif
+                    </td>
                 </tr>
+                @empty
+                <tr>
+                    <td colspan="6" class="text-center text-gray-500 py-4">No pending reviews available.</td>
+                </tr>
+                @endforelse
             </tbody>
         </table>
     </main>

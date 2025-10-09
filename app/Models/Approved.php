@@ -15,6 +15,7 @@ class Approved extends Model
     protected $fillable = [
         'user_ID',
         'Protocol_ID',
+        'Decision',
     ];
 
     // Relations

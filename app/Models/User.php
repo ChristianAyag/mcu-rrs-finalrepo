@@ -120,4 +120,8 @@ class User extends Authenticatable
     {
         return $this->hasOne(\App\Models\Protocol::class, 'user_ID', 'user_ID');
     }
+    public function approved()
+    {
+        return $this->hasMany(Approved::class, 'user_ID', 'user_ID');
+    }
 }

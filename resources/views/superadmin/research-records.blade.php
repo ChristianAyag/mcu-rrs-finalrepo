@@ -9,90 +9,71 @@
 
         <table id="myTable" class="display overflow-scroll border-collapse w-full">
             <!-- Table header -->
-            <thead class="bg-primary text-white text-lg/7 max-lg:text-base/7">
+            <thead class="bg-primary text-white text-lg/7 max-sm:text-base/7">
                 <tr class="header-table">
-                    <th class="w-[12.50%]">P.I. Name</th>
-                    <th class="w-[12.50%]">Research Title</th>
-                    <th class="w-[12.50%]">Date of Submission</th>
-                    <th class="w-[12.50%]">Classification of Reviews</th>
-                    <th class="w-[12.50%]">Status of Review</th>
-                    <th class="w-[12.50%]">Reviewer</th>
-                    <th class="w-[12.50%]">Decision</th>
-                    <th class="w-[12.50%]">Date Edited</th>
+                    <th class="w-[10%]">Research Title</th>
+                    <th class="w-[10%]">P.I. Name</th>
+                    <th class="w-[10%]">Date of Submission</th>
+                    <th class="w-[10%]">Protocol No.</th>
+                    <th class="w-[10%]">Review Type</th>
+                    <th class="w-[10%]">Reviewer no. 1</th>
+                    <th class="w-[10%]">Status of Review</th>
+                    <th class="w-[10%]">Reviewer no. 2</th>
+                    <th class="w-[10%]">Status of Review</th>
+                    <th class="w-[10%]">Decision</th>
                 </tr>
             </thead>
+
             <!-- Table body -->
             <tbody class="text-base/7 max-lg:text-sm/6">
+                @foreach($Records as $research)
                 <tr>
-                    <td>John Doe</td>
-                    <td>Brain Injury: Prevention and Treatment of Chronic Brain Injury</td>
-                    <td>2025/05/06<br>16:43:20</td>
-                    <td>Expedited</td>
-                    <td>Ongoing Review</td>
-                    <td>Thomas Hardy</td>
-                    <td>Ongoing</td>
-                    <td>N/A</td>
+                    <!-- Research Title -->
+                    <td>{{ $research->research_title }}</td>
+
+                    <!-- P.I. Name -->
+                    <td>
+                        {{ $research->user->full_name }}
+                    </td>
+
+                    <!-- Latest Submission Timestamp (12-hour format) -->
+                    @php
+                        $latestSubmission = $research->user->researchFiles->max('submitted_at');
+                    @endphp
+                    <td>
+                        @if($latestSubmission)
+                            {{ \Carbon\Carbon::parse($latestSubmission)
+                                ->timezone(config('app.timezone'))
+                                ->format('Y/m/d h:i:s A') }}
+                        @else
+                            N/A
+                        @endif
+                    </td>
+
+                    <!-- Protocol No. -->
+                    @php
+                        $protocol = optional($research->user->initialReviews->first()->protocol)->protocol_ID ?? 'N/A';
+                    @endphp
+                    <td>{{ $protocol }}</td>
+
+                    <!-- Classification -->
+                    <td>{{ optional($research->user->initialReviews->first()->protocol)->review_type ?? 'N/A' }}</td>
+
+                    <!-- Reviewer 1 & Status -->
+                    <td>{{ optional($research->user->initialReviews->first()->reviewer1)->full_name ?? 'N/A' }}</td>
+                    <td>{{ optional($research->user->initialReviews->first())->status ?? 'Ongoing' }}</td>
+
+                    <!-- Reviewer 2 & Status -->
+                    <td>{{ optional($research->user->initialReviews->first()->reviewer2)->full_name ?? 'N/A' }}</td>
+                    <td>{{ optional($research->user->initialReviews->skip(1)->first())->status ?? 'Ongoing' }}</td>
+
+                    <!-- Decision -->
+                    @php
+                        $decision = optional($research->user->approved->first())->Decision ?? 'Ongoing';
+                    @endphp
+                    <td>{{ $decision }}</td>
                 </tr>
-                <tr>
-                    <td>John Doe</td>
-                    <td>Brain Injury: Prevention and Treatment of Chronic Brain Injury</td>
-                    <td>2025/05/06<br>16:43:20</td>
-                    <td>Expedited</td>
-                    <td>Ongoing Review</td>
-                    <td>Thomas Hardy</td>
-                    <td>Ongoing</td>
-                    <td>N/A</td>
-                </tr>
-                <tr>
-                    <td>John Doe</td>
-                    <td>Brain Injury: Prevention and Treatment of Chronic Brain Injury</td>
-                    <td>2025/05/06<br>16:43:20</td>
-                    <td>Expedited</td>
-                    <td>Ongoing Review</td>
-                    <td>Thomas Hardy</td>
-                    <td>Ongoing</td>
-                    <td>N/A</td>
-                </tr>
-                <tr>
-                    <td>John Doe</td>
-                    <td>Brain Injury: Prevention and Treatment of Chronic Brain Injury</td>
-                    <td>2025/05/06<br>16:43:20</td>
-                    <td>Expedited</td>
-                    <td>Ongoing Review</td>
-                    <td>Thomas Hardy</td>
-                    <td>Ongoing</td>
-                    <td>N/A</td>
-                </tr>
-                <tr>
-                    <td>John Doe</td>
-                    <td>Brain Injury: Prevention and Treatment of Chronic Brain Injury</td>
-                    <td>2025/05/06<br>16:43:20</td>
-                    <td>Expedited</td>
-                    <td>Ongoing Review</td>
-                    <td>Thomas Hardy</td>
-                    <td>Ongoing</td>
-                    <td>N/A</td>
-                </tr>
-                <tr>
-                    <td>John Doe</td>
-                    <td>Brain Injury: Prevention and Treatment of Chronic Brain Injury</td>
-                    <td>2025/05/06<br>16:43:20</td>
-                    <td>Expedited</td>
-                    <td>Ongoing Review</td>
-                    <td>Thomas Hardy</td>
-                    <td>Ongoing</td>
-                    <td>N/A</td>
-                </tr>
-                <tr>
-                    <td>John Doe</td>
-                    <td>Brain Injury: Prevention and Treatment of Chronic Brain Injury</td>
-                    <td>2025/05/06<br>16:43:20</td>
-                    <td>Expedited</td>
-                    <td>Ongoing Review</td>
-                    <td>Thomas Hardy</td>
-                    <td>Ongoing</td>
-                    <td>N/A</td>
-                </tr>
+                @endforeach
             </tbody>
         </table>
     </main>

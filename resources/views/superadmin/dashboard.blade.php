@@ -41,23 +41,23 @@
                 <h2 class="text-[20px] max-sm:text-[17px] font-semibold mb-4">RESEARCH PROTOCOL</h2>
                 <div class="grid max-md:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div class="card bg-lightgray p-4 rounded-lg border border-gray shadow">
-                        <h3 class="text-2xl max-md:text-[22px] max-sm:text-xl font-semibold">5</h3>
-                        <p class="max-xl:text-sm">EVALUATED</p>
+                        <h3 class="text-2xl max-md:text-[22px] max-sm:text-xl font-semibold">{{ $totalAssignedProtocols }}</h3>
+                        <p class="max-xl:text-sm">ASSIGNED PROTOCOLS</p>
                     </div>
                     <div class="card bg-lightgray p-4 rounded-lg border border-gray shadow">
-                        <h3 class="text-2xl max-md:text-[22px] max-sm:text-xl font-semibold">10</h3>
-                        <p class="max-xl:text-sm">PENDING REVIEWS</p>
+                        <h3 class="text-2xl max-md:text-[22px] max-sm:text-xl font-semibold">{{ $protocolsWithoutReviewer }}</h3>
+                        <p class="max-xl:text-sm">PENDING ASSIGNMENT OF REVIEWER</p>
                     </div>
                     <div class="card bg-lightgray p-4 rounded-lg border border-gray shadow">
-                        <h3 class="text-2xl max-md:text-[22px] max-sm:text-xl font-semibold">12</h3>
+                        <h3 class="text-2xl max-md:text-[22px] max-sm:text-xl font-semibold">{{ $ongoingReviews }}</h3>
                         <p class="max-xl:text-sm">ONGOING REVIEWS</p>
                     </div>
                     <div class="card bg-lightgray p-4 rounded-lg border border-gray shadow">
-                        <h3 class="text-2xl max-md:text-[22px] max-sm:text-xl font-semibold">5</h3>
-                        <p class="max-xl:text-sm">TERMINATED</p>
+                        <h3 class="text-2xl max-md:text-[22px] max-sm:text-xl font-semibold">{{ $evaluatedReviews }}</h3>
+                        <p class="max-xl:text-sm">EVALUATED PROTOCOLS</p>
                     </div>
                     <div class="card bg-lightgray p-4 rounded-lg border border-gray shadow">
-                        <h3 class="text-2xl max-md:text-[22px] max-sm:text-xl font-semibold">10</h3>
+                        <h3 class="text-2xl max-md:text-[22px] max-sm:text-xl font-semibold">{{ $approvedProtocols }}</h3>
                         <p class="max-xl:text-sm">APPROVED</p>
                     </div>
                 </div>

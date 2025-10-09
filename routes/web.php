@@ -157,9 +157,7 @@ Route::middleware(['auth', 'access:IACUC Admin'])->prefix('iacuc')->group(functi
 Route::middleware(['auth', 'access:Superadmin'])->prefix('superadmin')->group(function () {
 
     // Dashboard
-    Route::get('/dashboard', function () {
-        return view('superadmin.dashboard');
-    })->name('superadmin.dashboard');
+    Route::get('/dashboard', [MonitoringDashboard::class,'dashboard'])->name('superadmin.dashboard');
 
     // Permission control
     Route::get('/permission-control', [RegisteredUserController::class, 'index'])->name('permission-control');
@@ -170,17 +168,14 @@ Route::middleware(['auth', 'access:Superadmin'])->prefix('superadmin')->group(fu
     Route::post('/classifications/bulk-update', [ClassificationController::class, 'bulkUpdate'])->name('classifications.bulk-update');
 
     // Other pages
-    Route::get('/pending-reviews', function () {
-        return view('superadmin.pending-reviews');
-    });
+    Route::get('/pending-reviews', [MonitoringDashboard::class,'viewEvaluatedProtocols'])
+    ->name('superadmin.pending-reviews');
 
-    Route::get('/assign-reviewer', function () {
-        return view('superadmin.assign-reviewer');
-    });
+    Route::get('/assign-reviewer', [MonitoringDashboard::class,'viewUnassignedReviewer'])
+    ->name('superadmin.assign-reviewer');
 
-    Route::get('/research-records', function () {
-        return view('superadmin.research-records');
-    });
+    Route::get('/research-records', [MonitoringDashboard::class,'superadminResearchRecords'])
+    ->name('superadmin.research-records');
 
     Route::get('/view-reviews', function () {
         return view('superadmin.view-reviews');
