@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('tbl_evaluated_reviews', function (Blueprint $table) {
             $table->id();
             $table->string('protocol_ID');
-            $table->string('reviewer_ID');
+            $table->string('reviewer_ID')->nullable();
             $table->string('status')->default('Pending');
             $table->timestamp('completed_at')->nullable();
             $table->timestamps();

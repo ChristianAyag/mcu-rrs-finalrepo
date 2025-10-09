@@ -166,13 +166,43 @@
     const rooms = document.querySelectorAll(".room");
     const assignedList = document.getElementById("assignedList");
 
-    // ✅ Toggle assigned forms visually
+    const reviewer1 = document.getElementById("reviewer1");
+    const reviewer2 = document.getElementById("reviewer2");
+    const reviewType = document.getElementById("reviewtype");
+
+    // Function to get assigned forms
+    function getAssignedForms() {
+        const forms = Array.from(assignedList.querySelectorAll("li")).map(li => li.textContent);
+        return forms.length ? forms.join(", ") : "—";
+    }
+
+    // Update forms display
+    function updateFormsDisplay() {
+        document.getElementById("r1_forms").textContent = reviewer1.value !== "N/A" ? getAssignedForms() : "—";
+        document.getElementById("r2_forms").textContent = reviewer2.value !== "N/A" ? getAssignedForms() : "—";
+    }
+
+    // Enable or disable form selection based on reviewer N/A
+    function updateFormSelectionState() {
+        const bothNA = reviewer1.value === "N/A" && reviewer2.value === "N/A";
+        rooms.forEach(room => {
+            room.classList.add("cursor-pointer"); // Always allow click, visual only
+        });
+    }
+
+    // Toggle assigned forms visually
     rooms.forEach(room => {
         room.addEventListener("click", () => {
             const formId = room.dataset.formid;
             const formCode = room.dataset.code;
-            const existingItem = assignedList.querySelector(`[data-formid="${formId}"]`);
 
+            const reviewer1NA = reviewer1.value === "N/A";
+            const reviewer2NA = reviewer2.value === "N/A";
+
+            // Only require forms if at least one reviewer is not N/A
+            if (reviewer1NA && reviewer2NA) return;
+
+            const existingItem = assignedList.querySelector(`[data-formid="${formId}"]`);
             if (existingItem) {
                 existingItem.remove();
                 room.classList.remove("bg-darkgray");
@@ -189,37 +219,19 @@
         });
     });
 
-    const reviewer1 = document.getElementById("reviewer1");
-    const reviewer2 = document.getElementById("reviewer2");
-    const reviewType = document.getElementById("reviewtype");
-
-    function getAssignedForms() {
-        const forms = Array.from(assignedList.querySelectorAll("li")).map(li => li.textContent);
-        return forms.length ? forms.join(", ") : "—";
+    // Reviewer change handlers
+    function updateReviewerInfo(reviewerElem, rName, rCollege, rProg, rType) {
+        const sel = reviewerElem.options[reviewerElem.selectedIndex];
+        document.getElementById(rName).textContent = sel.dataset.name || "—";
+        document.getElementById(rCollege).textContent = sel.dataset.college || "—";
+        document.getElementById(rProg).textContent = sel.dataset.prog || "—";
+        document.getElementById(rType).textContent = reviewType.value || "—";
+        updateFormsDisplay();
+        updateFormSelectionState();
     }
 
-    function updateFormsDisplay() {
-        document.getElementById("r1_forms").textContent = getAssignedForms();
-        document.getElementById("r2_forms").textContent = getAssignedForms();
-    }
-
-    reviewer1.addEventListener("change", () => {
-        const sel = reviewer1.options[reviewer1.selectedIndex];
-        document.getElementById("r1_name").textContent = sel.dataset.name || "—";
-        document.getElementById("r1_college").textContent = sel.dataset.college || "—";
-        document.getElementById("r1_prog").textContent = sel.dataset.prog || "—";
-        document.getElementById("r1_type").textContent = reviewType.value || "—";
-        updateFormsDisplay();
-    });
-
-    reviewer2.addEventListener("change", () => {
-        const sel = reviewer2.options[reviewer2.selectedIndex];
-        document.getElementById("r2_name").textContent = sel.dataset.name || "—";
-        document.getElementById("r2_college").textContent = sel.dataset.college || "—";
-        document.getElementById("r2_prog").textContent = sel.dataset.prog || "—";
-        document.getElementById("r2_type").textContent = reviewType.value || "—";
-        updateFormsDisplay();
-    });
+    reviewer1.addEventListener("change", () => updateReviewerInfo(reviewer1, "r1_name", "r1_college", "r1_prog", "r1_type"));
+    reviewer2.addEventListener("change", () => updateReviewerInfo(reviewer2, "r2_name", "r2_college", "r2_prog", "r2_type"));
 
     reviewType.addEventListener("change", () => {
         document.getElementById("r1_type").textContent = reviewType.value;
@@ -246,18 +258,21 @@
         const reviewer1Id = reviewer1.value;
         const reviewer2Id = reviewer2.value;
         const reviewTypeVal = reviewType.value;
-        const selectedForms = Array.from(assignedList.querySelectorAll("li")).map(li => li.getAttribute("data-formid"));
+        let selectedForms = Array.from(assignedList.querySelectorAll("li")).map(li => li.getAttribute("data-formid"));
+
+        const bothNA = reviewer1Id === "N/A" && reviewer2Id === "N/A";
 
         if (!userId) return alert("Please select a Principal Investigator.");
         if (!reviewer1Id || !reviewer2Id) return alert("Please select both reviewers.");
-        if (selectedForms.length === 0) return alert("Please select at least one form to assign.");
+        if (!bothNA && selectedForms.length === 0) return alert("Please select at least one form to assign.");
         if (!reviewTypeVal) return alert("Please select a review type.");
 
-        // ✅ Disable button while submitting
+        // ✅ If both reviewers are N/A, send an empty array
+        if (bothNA) selectedForms = [];
+
         submitBtn.disabled = true;
         submitBtn.textContent = "Submitting...";
 
-        // ✅ Prepare data payload
         const data = {
             _token: '{{ csrf_token() }}',
             pis: [userId],
@@ -267,7 +282,6 @@
             assigned_forms: selectedForms
         };
 
-        // ✅ Send AJAX POST
         fetch("{{ route('assign-reviewer.store') }}", {
             method: "POST",
             headers: {
@@ -305,5 +319,7 @@
             submitBtn.textContent = "Submit";
         });
     });
-</script>
 
+    // Initialize form selection state on page load
+    updateFormSelectionState();
+</script>

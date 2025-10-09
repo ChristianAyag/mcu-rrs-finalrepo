@@ -7,6 +7,8 @@ use App\Models\User;
 use App\Models\Protocol;
 use App\Models\InitialReview;
 use App\Models\FormsTable;
+use App\Models\EvaluatedReviews;
+use Illuminate\Validation\Rule;
 
 class assignReviewer extends Controller
 {
@@ -32,33 +34,32 @@ class assignReviewer extends Controller
 
     public function ERBstore(Request $request)
     {
+        // ✅ Validate request
         $request->validate([
             'pis' => 'required|array',
             'review_type' => 'required|string',
             'reviewer1_ID' => 'required|string',
             'reviewer2_ID' => 'required|string',
-            'assigned_forms' => 'required|array'
+            'assigned_forms' => [
+            'array',
+                Rule::requiredIf(function () use ($request) {
+                    return $request->reviewer1_ID !== 'N/A' || $request->reviewer2_ID !== 'N/A';
+                }),
+            ],
         ]);
 
         foreach ($request->pis as $piID) {
 
             // 🔹 Generate Incremental Protocol Code
             $year = date('Y');
-
-            // Get the latest number used for this year
             $latestProtocol = Protocol::where('protocol_ID', 'like', "ERB-$year-%")
                 ->orderBy('protocol_ID', 'desc')
                 ->first();
 
-            if ($latestProtocol) {
-                // Extract the numeric part (e.g., MCUERB-2025-005 → 5)
-                $lastNumber = intval(substr($latestProtocol->protocol_ID, strrpos($latestProtocol->protocol_ID, '-') + 1));
-                $nextNumber = $lastNumber + 1;
-            } else {
-                $nextNumber = 1;
-            }
+            $nextNumber = $latestProtocol
+                ? intval(substr($latestProtocol->protocol_ID, strrpos($latestProtocol->protocol_ID, '-') + 1)) + 1
+                : 1;
 
-            // Format with leading zeros (e.g., 001, 002, 003)
             $protocolCode = sprintf("ERB-%s-%03d", $year, $nextNumber);
 
             // 🔹 Save to tbl_protocol
@@ -68,16 +69,44 @@ class assignReviewer extends Controller
                 'review_type' => $request->review_type,
             ]);
 
-            // 🔹 Save to tbl_initial_review for each assigned form
-            foreach ($request->assigned_forms as $formName) {
-                $form = FormsTable::where('form_id', $formName)->first();
+            // 🔹 Determine valid reviewers
+            $reviewers = [
+                'reviewer1' => $request->reviewer1_ID !== 'N/A' ? $request->reviewer1_ID : null,
+                'reviewer2' => $request->reviewer2_ID !== 'N/A' ? $request->reviewer2_ID : null,
+            ];
 
-                InitialReview::create([
+            // 🔹 Assign forms to initial review if at least one reviewer is valid
+            if ($reviewers['reviewer1'] || $reviewers['reviewer2']) {
+                foreach ($request->assigned_forms as $formID) {
+                    InitialReview::create([
+                        'protocol_ID' => $protocol->protocol_ID,
+                        'user_ID' => $piID,
+                        'reviewer1_ID' => $reviewers['reviewer1'],
+                        'reviewer2_ID' => $reviewers['reviewer2'],
+                        'form_ID' => $formID,
+                    ]);
+                }
+            }
+
+            // 🔹 Create evaluated reviews for each valid reviewer
+            foreach ($reviewers as $key => $reviewerID) {
+                if ($reviewerID) {
+                    EvaluatedReviews::create([
+                        'protocol_ID' => $protocol->protocol_ID,
+                        'reviewer_ID' => null,
+                        'status' => 'Pending',
+                        'completed_at' => now(),
+                    ]);
+                }
+            }
+
+            // 🔹 If both reviewers are "N/A", create a single evaluated review with null reviewer_ID
+            if (!$reviewers['reviewer1'] && !$reviewers['reviewer2']) {
+                EvaluatedReviews::create([
                     'protocol_ID' => $protocol->protocol_ID,
-                    'user_ID' => $piID,
-                    'reviewer1_ID' => $request->reviewer1_ID,
-                    'reviewer2_ID' => $request->reviewer2_ID,
-                    'form_ID' => $form?->form_id,
+                    'reviewer_ID' => null, // ✅ works because reviewer_ID is nullable
+                    'status' => 'Completed',
+                    'completed_at' => now(),
                 ]);
             }
         }

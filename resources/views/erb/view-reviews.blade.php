@@ -47,9 +47,13 @@
                         </td>
 
                         <td>
-                            <a href="{{ route('erb.view-review-files', ['protocolId' => $review->protocol_ID, 'reviewerId' => $review->reviewer_ID]) }}">
-                                <button class="border-2 p-[5px] hover:bg-gray">View</button>
-                            </a>
+                            @if($review->reviewer_ID)
+                                <a href="{{ route('erb.view-review-files', ['protocolId' => $review->protocol_ID, 'reviewerId' => $review->reviewer_ID]) }}">
+                                    <button class="border-2 p-[5px] hover:bg-gray">View</button>
+                                </a>
+                            @else
+                                N/A
+                            @endif
                         </td>
 
                         <td>

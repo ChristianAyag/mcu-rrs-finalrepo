@@ -27,52 +27,40 @@
             <!-- Table body -->
             <tbody class="text-base/7 max-lg:text-sm/6">
                 @foreach($Records as $research)
-                <tr>
-                    <!-- Research Title -->
-                    <td>{{ $research->research_title }}</td>
-
-                    <!-- P.I. Name -->
-                    <td>
-                        {{ $research->user->full_name }}
-                    </td>
-
-                    <!-- Latest Submission Timestamp (12-hour format) -->
                     @php
+                        $firstReview = optional($research->user->initialReviews->first());
+                        $protocol = optional($firstReview->protocol)->protocol_ID ?? 'N/A';
+                        $reviewType = optional($firstReview->protocol)->review_type ?? 'N/A';
+                        $reviewer1 = optional($firstReview->reviewer1)->full_name ?? 'N/A';
+                        $status1 = $firstReview->status ?? 'Ongoing';
+                        $reviewer2 = optional($firstReview->reviewer2)->full_name ?? 'N/A';
+                        $status2 = optional($research->user->initialReviews->skip(1)->first())->status ?? 'Ongoing';
+                        $decision = optional($research->user->approved->first())->Decision ?? 'Ongoing';
                         $latestSubmission = $research->user->researchFiles->max('submitted_at');
                     @endphp
-                    <td>
-                        @if($latestSubmission)
-                            {{ \Carbon\Carbon::parse($latestSubmission)
-                                ->timezone(config('app.timezone'))
-                                ->format('Y/m/d h:i:s A') }}
-                        @else
-                            N/A
-                        @endif
-                    </td>
 
-                    <!-- Protocol No. -->
-                    @php
-                        $protocol = optional($research->user->initialReviews->first()->protocol)->protocol_ID ?? 'N/A';
-                    @endphp
-                    <td>{{ $protocol }}</td>
-
-                    <!-- Classification -->
-                    <td>{{ optional($research->user->initialReviews->first()->protocol)->review_type ?? 'N/A' }}</td>
-
-                    <!-- Reviewer 1 & Status -->
-                    <td>{{ optional($research->user->initialReviews->first()->reviewer1)->full_name ?? 'N/A' }}</td>
-                    <td>{{ optional($research->user->initialReviews->first())->status ?? 'Ongoing' }}</td>
-
-                    <!-- Reviewer 2 & Status -->
-                    <td>{{ optional($research->user->initialReviews->first()->reviewer2)->full_name ?? 'N/A' }}</td>
-                    <td>{{ optional($research->user->initialReviews->skip(1)->first())->status ?? 'Ongoing' }}</td>
-
-                    <!-- Decision -->
-                    @php
-                        $decision = optional($research->user->approved->first())->Decision ?? 'Ongoing';
-                    @endphp
-                    <td>{{ $decision }}</td>
-                </tr>
+                    <tr>
+                        <td>{{ $research->research_title }}</td>
+                        <td>
+                            {{ $research->user->full_name }}
+                        </td>
+                        <td>
+                            @if($latestSubmission)
+                                {{ \Carbon\Carbon::parse($latestSubmission)
+                                    ->timezone(config('app.timezone'))
+                                    ->format('Y/m/d h:i:s A') }}
+                            @else
+                                N/A
+                            @endif
+                        </td>
+                        <td>{{ $protocol }}</td>
+                        <td>{{ $reviewType }}</td>
+                        <td>{{ $reviewer1 }}</td>
+                        <td>{{ $status1 }}</td>
+                        <td>{{ $reviewer2 }}</td>
+                        <td>{{ $status2 }}</td>
+                        <td>{{ $decision }}</td>
+                    </tr>
                 @endforeach
             </tbody>
         </table>
