@@ -11,7 +11,6 @@ class Approved extends Model
 
     protected $table = 'tbl_approved';
     protected $primaryKey = 'id';
-    public $timestamps = false;
 
     protected $fillable = [
         'user_ID',

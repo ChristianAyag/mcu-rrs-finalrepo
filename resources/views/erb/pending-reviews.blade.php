@@ -91,10 +91,6 @@
                         <span>Resubmission</span>
                     </div>
                     <div class="flex gap-x-1">
-                        <input type="radio" name="decision" value="Amendments" class="mt-1 w-[14px] h-[14px]">
-                        <span>Amendments</span>
-                    </div>
-                    <div class="flex gap-x-1">
                         <input type="radio" name="decision" value="Approved" class="mt-1 w-[14px] h-[14px]">
                         <span>Approved</span>
                     </div>
