@@ -18,6 +18,7 @@ use App\Http\Controllers\ERBReviewer;
 use App\Http\Controllers\ERBViewReviews;
 use App\Http\Controllers\ERBDecisionController;
 use App\Http\Controllers\TicketController;
+use App\Http\Middleware\CheckReviewerInformation;
 use Laravel\Tinker\ClassAliasAutoloader;
 
 //Students Form
@@ -83,7 +84,7 @@ Route::middleware(['auth', 'access:ERB Admin', 'no-cache','prevent-back'])->pref
         ->name('erb.research-records');
 
     // Submitted Documents for a specific user
-    Route::get('/submitted-documents/{userId}', [ResearchFileController::class, 'submittedDocuments'])
+    Route::get('/submitted-documents/{userId}', [ResearchFileController::class, 'submittedDocumentsErb'])
         ->name('erb.submitted-documents');
 
     // In your routes file (web.php)
@@ -264,7 +265,7 @@ Route::middleware(['auth', 'access:Superadmin', 'no-cache', 'prevent-back'])->pr
 });
 
 //erb reviewer - ADDED no-cache MIDDLEWARE
-Route::middleware(['auth', 'access:ERB Reviewer', 'check.reviewer.info', 'no-cache', 'prevent-back'])->prefix('erb-reviewer')->group(function () {
+Route::middleware(['auth', 'access:ERB Reviewer', CheckReviewerInformation::class, 'no-cache', 'prevent-back'])->prefix('erb-reviewer')->group(function () {
 
     // Dashboard
     Route::get('/dashboard', function () {
@@ -326,9 +327,21 @@ Route::middleware(['auth', 'access:ERB Reviewer', 'no-cache', 'prevent-back'])
         Route::post('/college-dept', [ReviewerInformationController::class, 'erbStore'])
             ->name('erb-reviewer.college-dept.store');
     });
+
+Route::middleware(['auth', 'access:IACUC Reviewer', 'no-cache', 'prevent-back'])
+    ->prefix('iacuc-reviewer')
+    ->group(function () {
+
+        // If reviewer has NOT yet completed college/dept info, show form
+        Route::get('/college-dept', [ReviewerInformationController::class, 'iacucCreate'])
+            ->name('iacuc-reviewer.college-dept');
+
+        Route::post('/college-dept', [ReviewerInformationController::class, 'iacucStore'])
+            ->name('iacuc-reviewer.college-dept.store');
+    });
     
 //iacuc reviewer - ADDED no-cache MIDDLEWARE
-Route::middleware(['auth', 'access:IACUC Reviewer', 'no-cache', 'prevent-back'])->prefix('iacuc-reviewer')->group(function () {
+Route::middleware(['auth', 'access:IACUC Reviewer',CheckReviewerInformation::class, 'no-cache', 'prevent-back'])->prefix('iacuc-reviewer')->group(function () {
     Route::get('/dashboard', function () {
         return view('iacuc-reviewer.dashboard');
     })->name('iacuc-reviewer.dashboard');
@@ -339,10 +352,6 @@ Route::middleware(['auth', 'access:IACUC Reviewer', 'no-cache', 'prevent-back'])
 
     Route::get('/settings', function () {
         return view('iacuc-reviewer.settings');
-    });
-
-    Route::get('/college-dept', function () {
-        return view('iacuc-reviewer.college-dept');
     });
 
     Route::get('/forms/protocol-review', function () {

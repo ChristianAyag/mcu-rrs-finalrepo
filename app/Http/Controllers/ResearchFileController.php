@@ -56,25 +56,55 @@ class ResearchFileController extends Controller
                     'submitted_at' => now(),
                 ]);
 
-                // Send notification to all ERB Admins
-                $adminUsers = User::where('user_Access', 'ERB Admin')->get();
+                // Determine which admins to notify based on user classification
+                $adminUsers = collect();
                 
+                // Check user classification (assuming these fields exist in your users table)
+                if ($user->classification === 'IACUC') {
+                    $adminUsers = $adminUsers->merge(User::where('user_Access', 'IACUC Admin')->get());
+                } 
+                elseif ($user->classification === 'ERB') {
+                    $adminUsers = $adminUsers->merge(User::where('user_Access', 'ERB Admin')->get());
+                } 
+                elseif ($user->classification === 'BOTH') {
+                    $iacucAdmins = User::where('user_Access', 'IACUC Admin')->get();
+                    $erbAdmins = User::where('user_Access', 'ERB Admin')->get();
+                    $adminUsers = $adminUsers->merge($iacucAdmins)->merge($erbAdmins);
+                }
+                
+                // Alternative approach if you have separate boolean fields
+                /*
+                if ($user->is_iacuc || $user->classification === 'both') {
+                    $adminUsers = $adminUsers->merge(User::where('user_Access', 'IACUC Admin')->get());
+                }
+                if ($user->is_erb || $user->classification === 'both') {
+                    $adminUsers = $adminUsers->merge(User::where('user_Access', 'ERB Admin')->get());
+                }
+                */
+
+                // Send notification to appropriate admins
                 if ($adminUsers->isNotEmpty()) {
                     Notification::send($adminUsers, new FileUploaded($user, $formId, $filename));
                 }
             }
         }
-
         return redirect()->back()->with('success', 'Files submitted successfully!');
     }
 
-    public function submittedDocuments($userId)
+    public function submittedDocumentsErb($userId)
     {
+        $user = User::findOrFail($userId);
+        
+        // Check if user is classified for ERB or BOTH
+        if (!$user->classifications || !in_array($user->classifications->reviewClassification, ['ERB', 'BOTH'])) {
+            return redirect()->back()->with('error', 'This user is not classified for ERB submissions.');
+        }
+        
         $piFiles = User::with(['researchFiles' => function($query) {
-            $query->where('status', 'active'); // Only show active files
+            $query->where('status', 'active');
         }])->findOrFail($userId);
 
-        return view('erb.submitted-documents', compact('piFiles'));
+        return view('erb.submitted-documents', compact('piFiles', 'user'));
     }
 
     // Add this method to handle soft deletion
@@ -93,25 +123,65 @@ class ResearchFileController extends Controller
     public function researchRecords()
     {
         $researchRecords = ResearchInformation::with([
-            // Load the P.I. user and their related data
             'user' => function ($query) {
                 $query->with([
-                    // Load all submitted files
                     'researchFiles',
-                    // Load all initial reviews and reviewers
                     'initialReviews' => function ($q) {
                         $q->with([
-                            'protocol',        // Load protocol info
-                            'reviewer1',       // Load reviewer 1 details
-                            'reviewer2',       // Load reviewer 2 details
+                            'protocol',
+                            'reviewer1',
+                            'reviewer2',
                         ]);
                     },
-                    // Load approved decisions
-                    'approved'
+                    'approved',
+                    'classifications' // Use the plural relationship name
                 ]);
             },
-        ])->get();
+        ])->whereHas('user.classifications', function ($query) {
+            $query->whereIn('reviewClassification', ['ERB', 'BOTH']);
+        })->get();
 
         return view('erb.research-records', compact('researchRecords'));
+    }
+
+    /*LAHAT NG IACUC CLASS DITOOOO*/
+    public function researchRecordsIacuc()
+    {
+        $researchRecords = ResearchInformation::with([
+            'user' => function ($query) {
+                $query->with([
+                    'researchFiles',
+                    'initialReviews' => function ($q) {
+                        $q->with([
+                            'protocol',
+                            'reviewer1',
+                            'reviewer2',
+                        ]);
+                    },
+                    'approved',
+                    'classifications' // Use the plural relationship name
+                ]);
+            },
+        ])->whereHas('user.classifications', function ($query) {
+            $query->whereIn('reviewClassification', ['IACUC', 'BOTH']);
+        })->get();
+
+        return view('iacuc.research-records', compact('researchRecords'));
+    }
+
+    public function submittedDocumentsIacuc($userId)
+    {
+        $user = User::findOrFail($userId);
+        
+        // Check if user is classified for IACUC or BOTH
+        if (!$user->classifications || !in_array($user->classifications->reviewClassification, ['IACUC', 'BOTH'])) {
+            return redirect()->back()->with('error', 'This user is not classified for IACUC submissions.');
+        }
+        
+        $piFiles = User::with(['researchFiles' => function($query) {
+            $query->where('status', 'active');
+        }])->findOrFail($userId);
+
+        return view('iacuc.submitted-documents', compact('piFiles', 'user'));
     }
 }

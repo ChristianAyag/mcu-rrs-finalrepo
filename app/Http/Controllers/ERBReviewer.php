@@ -40,12 +40,17 @@ class ERBReviewer extends Controller
         $userId = $request->query('user_id');
 
         // Find PI and load all submitted research files with related form info
-        $pi = User::with(['researchFiles.form'])
+        $pi = User::with(['researchFiles.form', 'classifications'])
             ->where('user_ID', $userId)
             ->first();
 
         if (!$pi) {
             return back()->with('error', 'Principal Investigator not found.');
+        }
+
+        // Check if user is classified for ERB or BOTH
+        if (!$pi->classifications || !in_array($pi->classifications->reviewClassification, ['ERB', 'BOTH'])) {
+            return back()->with('error', 'This user is not classified for ERB submissions.');
         }
 
         $files = $pi->researchFiles; // All files submitted by this user

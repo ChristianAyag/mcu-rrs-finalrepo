@@ -23,9 +23,6 @@ return new class extends Migration
 
             $table->foreign('user_ID')->references('user_ID')->on('tbl_users')->onDelete('cascade');
             $table->foreign('form_id')->references('form_id')->on('tbl_forms')->onDelete('cascade');
-
-            // prevent duplicate submissions (one submission per user+form)
-            //$table->unique(['user_ID', 'form_id']);
         });
     }
 
